@@ -1,0 +1,3 @@
+# put everything that pip3 needs to instal for your .py file on your containers
+tweepy
+pymongo

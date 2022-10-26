@@ -1,0 +1,44 @@
+version: '3'
+services:
+
+   # Service Name:
+   mongo_for_tweets:
+      image: mongo
+      container_name: 'mongo_for_tweets'
+      ports:
+         - "27018:27017"
+
+   tweet_collector:
+      # name of the container (arbitrary)
+      build: ./my_tweet_collector
+      volumes:
+         - ./my_tweet_collector/:/app
+      depends_on:
+         - mongo_for_tweets
+
+   mypostgres:
+      image: postgres
+      container_name: 'mypostgres'
+      ports:
+         - "5555:5432"
+      environment:
+         - POSTGRES_USER=siamak
+         - POSTGRES_PASSWORD=123
+         - POSTGRES_DB=postgres_for_tweets
+
+   etl:
+      build: etl_job
+      volumes:
+         - ./etl_job/:/app
+      depends_on:
+         - mongo_for_tweets
+         - mypostgres
+
+   slack_bot:
+      build: slack_job/
+      volumes:
+         - ./slack_job/:/app
+      depends on:
+         - etl_job
+
+      
